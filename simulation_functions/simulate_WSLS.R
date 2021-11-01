@@ -1,4 +1,4 @@
-simulate_WSLS<-function ( Data, beta, initialQ){
+simulate_WSLS<-function ( Data, beta, initialV){
   #----------------------------------------------------------------------------#
   # This function computes choices
   # choices conditional on a win stay lose shift model
@@ -6,6 +6,7 @@ simulate_WSLS<-function ( Data, beta, initialQ){
   # Input
   #   Data: data containing the structure of the task
   #   beta : beta parameter
+  #   initialV: initial expected values for the choices
   # Output:
   #   Dataframe with $response and $object_cat
   #----------------------------------------------------------------------------#

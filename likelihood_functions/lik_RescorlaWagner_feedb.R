@@ -1,4 +1,4 @@
-lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
+lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialV){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -11,7 +11,7 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
   #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
   #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
   #           of choosing category 1), 9:"P2", 10: "P3"
-  #   initialQ: value of the inital Q
+  #   initialV: value of the inital V
   #
   # Output:
   #   Negative Log Likelihood
@@ -23,16 +23,9 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
   murks<-levels(as.factor(Data$cuedCharacter))
   
   Data$cuedCharacter<-as.character(Data$cuedCharacter)
-  
-  #1  "Electronic device & accessory"  2  "Hand labour tool & accessory" 
-  # 3 "Kitchen & utensil"     4  "Outdoor activity & sport item"
-  #Data$catNum<-as.numeric((Data$respCat))
-  
-  ##Data$corrCat<-as.numeric((Data$corrCat))
-  
-  
+
   # Initialize variables: Qs, the expected values
-  Data$Q1<-NA; Data$Q2<-NA; Data$Q3<-NA ; Data$Q4<-NA 
+  Data$V1<-NA; Data$V2<-NA; Data$V3<-NA ; Data$V4<-NA 
 
   # Ps (probabilities for each category's choice)
   Data$P1<-NA; Data$P2<-NA; Data$P3<-NA ; Data$P4<-NA
@@ -44,7 +37,7 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
   Data$Delta<-NA
 
   # index variables for Q, P, and Delta
-  Qindex<-c("Q1", "Q2", "Q3", "Q4")
+  Qindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
 
   # Counter for indicating which character has to be updated
@@ -62,17 +55,17 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-rep(initialQ, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
-      Q<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Qindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
     }
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(Q, beta)
+    p<-softmax(V, beta)
     
-    # compute Q, delta, and choice probability for actual choice, only if a choice is computed
+    # compute V, delta, and choice probability for actual choice, only if a choice is computed
     if (Data$response[t]!=0 & !is.na(Data$response[t]) ) {
       
       # which category was the response?
@@ -85,7 +78,6 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
       
       #which cat is the corr ans?
       corr_resp<-Data$obj_category[t]
-      
       
       # get accuracy
       if (Data$respCat[t]==corr_resp){
@@ -106,10 +98,10 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
       respCounter<-which(categ == Data$respCat[t])
       
      # prediction error
-      delta <- r - Q[respCounter]
+      delta <- r - V[respCounter]
       
       # update Q
-      Q[respCounter]<-Q[respCounter]+alpha*delta
+      V[respCounter]<-V[respCounter]+alpha*delta
       
       # assign it to the dataset
       Data$Delta[t]<-delta
@@ -126,12 +118,9 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialQ){
       count2<-count2+1
     }
 
-        
-  
   # assign values to the dataset
-  Data[t, Qindex]<-Q
+  Data[t, Vindex]<-Q
   Data[t, Pindex]<-p
-  
  
 }
 # we could take the probability only for the congruent trials, but for now we are taking all the probabilities

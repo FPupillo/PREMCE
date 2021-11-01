@@ -1,4 +1,4 @@
-lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
+lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -13,7 +13,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
   #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
   #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
   #           of choosing category 1), 9:"P2", 10: "P3"
-  #   initialQ: value of the inital Q
+  #   initial|: value of the inital Q
   #
   # Output:
   #   Negative Log Likelihood
@@ -25,16 +25,9 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
   murks<-levels(as.factor(Data$cuedCharacter))
   
   Data$cuedCharacter<-as.character(Data$cuedCharacter)
-  
-  #1  "Electronic device & accessory"  2  "Hand labour tool & accessory" 
-  # 3 "Kitchen & utensil"     4  "Outdoor activity & sport item"
-  #Data$catNum<-as.numeric((Data$respCat))
-  
-  ##Data$corrCat<-as.numeric((Data$corrCat))
-  
-  
+
   # Initialize variables: Qs, the expected values
-  Data$Q1<-NA; Data$Q2<-NA; Data$Q3<-NA ; Data$Q4<-NA 
+  Data$V1<-NA; Data$V2<-NA; Data$V3<-NA ; Data$V4<-NA 
 
   # Ps (probabilities for each category's choice)
   Data$P1<-NA; Data$P2<-NA; Data$P3<-NA ; Data$P4<-NA
@@ -58,7 +51,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
   Data$alpha<-NA
   
   # index variables for Q, P, and Delta
-  Qindex<-c("Q1", "Q2", "Q3", "Q4")
+  Qindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
 
   # Counter for indicating which character has to be updated
@@ -76,9 +69,9 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-rep(initialQ, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      Q<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
-      Q<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Qindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
       # retrieve the learning rate
        alpha<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"alpha"] 
       }
@@ -86,7 +79,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(Q, beta)
+    p<-softmax(V, beta)
     
     # compute Q, delta, and choice probability for actual choice, only if a choice is computed
     if (Data$response[t]!=0 & !is.na(Data$response[t]) ) {
@@ -128,18 +121,17 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
       Data$Prob[t]<- prob[count2]
       
      # prediction error
-      delta <- r - Q[respCounter]
+      delta <- r - V[respCounter]
       
       # update Q
-      Q[respCounter]<-Q[respCounter]+k*alpha*delta
+      V[respCounter]<-V[respCounter]+k*alpha*delta
       
       # update alpha
       alpha<- eta *abs(delta) + (1-eta) * alpha
       
       # assign delta to the dataset
       Data$Delta[t]<-delta
-      
-
+    
       # That is the category to updated
       
       # probability only for the response made by participant
@@ -149,14 +141,11 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initialQ){
       count2<-count2+1
     }
 
-        
-  
   # assign values to the dataset
-  Data[t, Qindex]<-Q
+  Data[t, Vindex]<-V
   Data[t, Pindex]<-p
   Data$alpha[t]<-unlist(alpha)      
   
- 
 }
 # we could take the probability only for the congruent trials, but for now we are taking all the probabilities
 

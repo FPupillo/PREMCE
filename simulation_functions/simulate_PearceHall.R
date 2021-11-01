@@ -1,4 +1,4 @@
-simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
+simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
   # This function computes the likelihood of the participants'
   # choices conditional on the Pearce Hall model 
   #
@@ -7,13 +7,13 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
   #   alpha_0: initial associability parameter 
   #   beta:  beta parameter
   #   k : weight of associability
-  #   y : weight between associability and PE
-  #   initialQ: value of the inital Q
+  #   gamma : weight between associability and PE
+  #   initialV: value of the inital V
   #
   # Output:
   #   dastaframe with $response and $object_cat
   # -------------
-
+  
   # convert the object category into numeric variable
   categ<-levels(as.factor(Data$obj_category))
   
@@ -27,13 +27,13 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
   for (n in 1:4){
     
     # Initialize variables: Qs, the expected values
-    Data[[paste("Q", n, sep="")]]<-NA
+    Data[[paste("V", n, sep="")]]<-NA
     
     # Ps (probabilities for each category's choice)
     Data[[paste("P", n, sep="")]]<-NA
     
   }
-
+  
   # probability for the choice that participants' made on a trial
   Data$Prob<-NA
   
@@ -55,17 +55,16 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
   # learning rate
   Data$alpha<-NA
   
-  # index variables for Q, P, and Delta
-  Qindex<-c("Q1", "Q2", "Q3", "Q4")
+  # index variables fr Q, P, and Delta
+  Vindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
-  #Deltaindex<-c("Delta1", "Delta2", "Delta3", "Delta4")
   
   # Counter for indicating which character has to be updated
   count<-rep(0, 2)
   
   # initialise choice probability and counter for the choiceprobability
   prob<-NA
-
+  
   
   # loop over trials
   for (t in 1: nrow(Data) ){ 
@@ -75,21 +74,20 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-rep(initialQ, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
-        Q<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Qindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
-        # retrieve the prediciton error
-        alpha<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"alpha"] 
-        }
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      # retrieve the prediciton error
+      alpha<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"alpha"] 
+    }
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(Q, beta)
+    p<-softmax(V, beta)
     
     # make choice according to choice probabilities
     Data$response[t] <- chooseMultinom(p)
-
     
     # map response onto the keys
     # which category was the response?
@@ -97,58 +95,48 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, eta,  initialQ){
     Data$respCat[t]<-as.character(categ[Data$response[t]])
     
     # which cat is the corr ans?
-      corr_resp<-Data$obj_category[t]
+    corr_resp<-Data$obj_category[t]
     
-      # get accuracy
-      if (Data$respCat[t]==corr_resp){
-        Data$accuracy[t]<-1
-      }else{
-        Data$accuracy[t]<-0
-      }
-      
-    # # which category was the response?
-    # # estract the order of the categories at trial t
-    # Data$respCat[t]<-as.character(unlist(Data[t,c("left_categ","centleft_categ" , 
-    #  "centright_categ","right_categ") ][Data$response[t]]))
+    # get accuracy
+    if (Data$respCat[t]==corr_resp){
+      Data$accuracy[t]<-1
+    }else{
+      Data$accuracy[t]<-0
+    }
     
-    # substring
-   # Data$respCat[t]<-substr(Data$respCat[t], 9, nchar(Data$respCat[t])-4)
-    
-    # placeholder for the category selected by part
-    #respCounter<-which(categ == as.character(Data$respCat[t]))
     
     # get the observation as 1 if that category is present, and 0 if it is not
     if (Data$accuracy[t]==1){
-       r<-1 
+      r<-1 
     } else {
-       r<-0
+      r<-0
     }
-        # prediction error
-        delta <- r -Q[Data$response[t]]
-        
-        # update Q
-        Q[Data$response[t]]<- Q[Data$response[t]]+k*alpha*delta
-        
-        # update alpha
-        alpha<- eta *abs(delta) + (1-eta) * alpha
-        
-        # assign delta and alpha to the dataset
-        Data$Delta[t]<-delta
-        
-        Data$alpha[t]<-unlist(alpha)
-        
-  # assign other values to the dataset
-  Data[t, Qindex]<-Q
-  Data[t, Pindex]<-p
-  
-  # convert the choice into the order of the categories
-  Data$response[t]<-which(unlist(Data[t,c("left_categ","centleft_categ" , 
-                                          "centright_categ","right_categ") ])== 
-                            paste0("stimuli/", Data$respCat[t],  ".png"))
-  
+    # prediction error
+    delta <- r -V[Data$response[t]]
+    
+    # update Q
+    V[Data$response[t]]<- V[Data$response[t]]+k*alpha*delta
+    
+    # update alpha
+    alpha<- gamma *abs(delta) + (1-gamma) * alpha
+    
+    # assign delta and alpha to the dataset
+    Data$Delta[t]<-delta
+    
+    Data$alpha[t]<-unlist(alpha)
+    
+    # assign other values to the dataset
+    Data[t, Vindex]<-V
+    Data[t, Pindex]<-p
+    
+    # convert the choice into the order of the categories
+    Data$response[t]<-which(unlist(Data[t,c("left_categ","centleft_categ" , 
+                                            "centright_categ","right_categ") ])== 
+                              paste0("stimuli/", Data$respCat[t],  ".png"))
+    
   }
   
   return(Data)
   
-  }
+}
 

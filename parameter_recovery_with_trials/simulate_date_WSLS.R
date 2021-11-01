@@ -6,7 +6,7 @@ rm(list=ls())
 
 #soruce the functions
 source("helper_functions/taskSim.R")
-source("simulation_functions/simulate_WSLS.R")
+source("simulation_functions/simulate_RescorlaWagner_feedb.R")
 source(("helper_functions/softmax.R"))
 source(("helper_functions/chooseMultinom.R"))
 source(("helper_functions/BICcompute.R"))
@@ -39,8 +39,8 @@ for (n in 1:nrow(Data)){
 }
 
 # simulate data
-sim<-simulate_WSLS(Data=Data, beta =7, 
-           initialQ = 0.25)
+sim<-simulate_RescorlaWagner_feedb(Data=Data,alpha =0.60, beta =7, 
+           initialV = 0.25)
 
 # plot the estimated probabilities
 ggplot(sim, aes(x=trialN))+
@@ -61,6 +61,24 @@ ggplot(sim, aes(x=trialN))+
   labs(y = "Estimated choice probabilities")+
   #facet_grid(butterfly~SubNum)+
   facet_wrap(character~., ncol = 3)
- 
 
+ggsave(filename = "figures/estimatedCP_RW_alpha=0.60_beta=7.jpg") 
+
+
+# now the prediction error
+# plot the estimated probabilities
+ggplot(sim, aes(x=trialN))+
+  # geom_line(aes(y=P1), size = 1.5, color = "blue")+
+  # geom_line(aes(y=P2),size = 1.5, color = "darkgreen")+
+  # geom_line(aes(y=P3),size = 1.5, color = "brown")+
+  # geom_line(aes(y=P4), size = 1.5,color = "orange")+
+  geom_line(aes(y=as.numeric(Delta)), color = "red")+
+  theme_bw()+
+  
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+  facet_wrap(character~., ncol = 3)+
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+  labs(y = "Prediction Error")+
+  #facet_grid(butterfly~SubNum)+
+  facet_wrap(character~., ncol = 3)
 

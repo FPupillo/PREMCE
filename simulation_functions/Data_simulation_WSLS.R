@@ -66,7 +66,7 @@ pb<-txtProgressBar(min=0, max=sims*length(beta) )
 
 for (simul in 1:sims){
   for (b in beta){
-  sim<-simulate_WSLS(Data=day2list,beta = b,  initialQ = 0.25)
+  sim<-simulate_WSLS(Data=day2list,beta = b,  initialV = 0.25)
 
   # calculate percentage optimal choice
   # rename variables
