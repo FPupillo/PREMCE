@@ -37,7 +37,7 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialV){
   Data$Delta<-NA
 
   # index variables for Q, P, and Delta
-  Qindex<-c("V1", "V2", "V3", "V4")
+  Vindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
 
   # Counter for indicating which character has to be updated
@@ -63,7 +63,7 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialV){
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(V, beta)
+    p<-softmax(p, beta)
     
     # compute V, delta, and choice probability for actual choice, only if a choice is computed
     if (Data$response[t]!=0 & !is.na(Data$response[t]) ) {
@@ -119,7 +119,7 @@ lik_RescorlaWagner_feedb<-function (Data,alpha, beta,print,  initialV){
     }
 
   # assign values to the dataset
-  Data[t, Vindex]<-Q
+  Data[t, Vindex]<-V
   Data[t, Pindex]<-p
  
 }

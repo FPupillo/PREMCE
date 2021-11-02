@@ -1,6 +1,6 @@
 #library(pracma)
 
-fit_RescorlaWagner_obsAll<-function(data,alphaBound, betaBound, initialQ){
+fit_RescorlaWagner_obsAll<-function(data,alphaBound, betaBound, initialV){
   # This function finds the parameters that 
   # minimize the negative log-likelihood
   #
@@ -22,7 +22,7 @@ fit_RescorlaWagner_obsAll<-function(data,alphaBound, betaBound, initialQ){
   # Similar to my suggestion about the number of starting points, you should add a variable to "06.Parameter_estimation" 
   # to determine the boundaries
   
-  obfunc<-function(x) lik_RescorlaWagner_obsALL(data, x[1], x[2],1, initialQ) # this function is similar to the MATLAB "handle" function
+  obfunc<-function(x) lik_RescorlaWagner_obsALL(data, x[1], x[2],1, initialV) # this function is similar to the MATLAB "handle" function
   
   # Find best-fitting parameters
   NegLL<-optim(X0, obfunc, method = "L-BFGS-B",lower = LB, upper=UB) 

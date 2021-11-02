@@ -1,4 +1,4 @@
-lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialQ){
+lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialV){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model . In this particular 
   # version, only the category shown is updated
@@ -11,7 +11,7 @@ lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialQ){
   #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
   #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
   #           of choosing category 1), 9:"P2", 10: "P3"
-  #   initialQ: value of the inital Q
+  #   initialV: value of the inital V
   #
   # Output:
   #   Negative Log Likelihood
@@ -29,12 +29,9 @@ lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialQ){
   # 3 "Kitchen & utensil"     4  "Outdoor activity & sport item"
   #Data$catNum<-as.numeric((Data$respCat))
   
-  ##Data$corrCat<-as.numeric((Data$corrCat))
-  
-  
   # Initialize variables: Qs, the expected values
-  Data$Q1<-NA; Data$Q2<-NA; Data$Q3<-NA ; Data$Q4<-NA 
-  Data$Qup1<-NA; Data$Qup2<-NA; Data$Qup3<-NA ; Data$Qup4<-NA
+  Data$V1<-NA; Data$V2<-NA; Data$V3<-NA ; Data$V4<-NA 
+  Data$Vup1<-NA; Data$Vup2<-NA; Data$Vup3<-NA ; Data$Vup4<-NA
   
   # Ps (probabilities for each category's choice)
   Data$P1<-NA; Data$P2<-NA; Data$P3<-NA ; Data$P4<-NA
@@ -58,8 +55,8 @@ lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialQ){
   #Data$CPP<-NA
   
   # index variables for Q, P, and Delta
-  Qindex<-c("Q1", "Q2", "Q3", "Q4")
-  Qupindex<-c("Qup1", "Qup2", "Qup3", "Qup4") 
+  Qindex<-c("V1", "V2", "V3", "V4")
+  Qupindex<-c("Vup1", "Vup2", "Vup3", "Vup4") 
   Pindex<-c("P1", "P2", "P3", "P4") 
   Deltaindex<-c("Delta1", "Delta2", "Delta3", "Delta4")
   xindex<-c("x1", "x2", "x3", "x4")
@@ -79,12 +76,12 @@ lik_RescorlaWagner_obs<-function (Data,alpha, beta,print,  initialQ){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-c(initialQ, initialQ, initialQ, initialQ) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
-      Q<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Qupindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vupindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
     }
     
-    Data[t, Qindex]<-Q
+    Data[t, Vindex]<-V
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     

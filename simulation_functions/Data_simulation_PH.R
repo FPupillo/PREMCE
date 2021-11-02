@@ -17,8 +17,6 @@ source(("computational_model/softmax.R"))
 source(("computational_model/chooseMultinom.R"))
 source(("computational_model/BICcompute.R"))
 source(("helper_functions/cumAcc.R"))
-#source("computational_model/likelihood_functions/lik_WSLS.R")
-#source("computational_model/fitting_functions/fit_WSLS.R")
 source("helper_functions/getOpt.R")
 source("helper_functions/isOpt.R")
 source("helper_functions/perOpt.R")
@@ -26,17 +24,6 @@ source("helper_functions/getCatresp.R")
 
 
 # the different models are
-# RW - RW agent
-# Bayesian_dorf - an agent that takes into account the beliefs about
-#                 CPP and incorporates them in a changing LR
-# Bayesian_Nassar - an agent that takes into account the beliefs about
-#                 CPP in a reduced Bayesian model
-# DualLR - a model that adapts the learning rate depending on the belief on the
-#         CPP
-
-# agents<-c("RW", "Bayesian_dorf", "Bayesian_Nassar", "DualLR")
-#
-# # first, retrieve the structure of the trials
 listPath<-"lists/"
 #
 # # now the day1

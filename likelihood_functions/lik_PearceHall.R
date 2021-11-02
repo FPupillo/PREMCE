@@ -1,4 +1,4 @@
-lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
+lik_PearceHall<-function (Data,alpha_0, beta, k, gamma,print,  initialV){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -8,12 +8,12 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
   #   alpha_0: initial associability parameter 
   #   beta:  beta parameter
   #   k : weight of associability
-  #   y : weight between associability and PE
+  #   gamma : weight between associability and PE
   #   print: 1: return only the negative log-likelihood; 
   #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
   #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
   #           of choosing category 1), 9:"P2", 10: "P3"
-  #   initial|: value of the inital Q
+  #   initialV: value of the inital V
   #
   # Output:
   #   Negative Log Likelihood
@@ -51,7 +51,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
   Data$alpha<-NA
   
   # index variables for Q, P, and Delta
-  Qindex<-c("V1", "V2", "V3", "V4")
+  Vindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
 
   # Counter for indicating which character has to be updated
@@ -69,7 +69,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
       V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
       # retrieve the learning rate
@@ -127,7 +127,7 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, eta,print,  initial|){
       V[respCounter]<-V[respCounter]+k*alpha*delta
       
       # update alpha
-      alpha<- eta *abs(delta) + (1-eta) * alpha
+      alpha<- gamma * abs(delta) + (1-gamma) * alpha
       
       # assign delta to the dataset
       Data$Delta[t]<-delta

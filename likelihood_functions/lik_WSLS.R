@@ -1,6 +1,6 @@
 lik_WSLS<-function (Data, beta,print,  initialV){
   # This function computes the likelihood of the participants'
-  # choices conditional on the Rescorla Wagner model 
+  # choices conditional win stay lose shift model
   #
   # Input
   #   Data: a long dataset where each row represents a trial. 
@@ -9,7 +9,7 @@ lik_WSLS<-function (Data, beta,print,  initialV){
   #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
   #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
   #           of choosing category 1), 9:"P2", 10: "P3"
-  #   initialQ: value of the inital Q
+  #   initialV: value of the inital V
   #
   # Output:
   #   Negative Log Likelihood
@@ -36,7 +36,7 @@ lik_WSLS<-function (Data, beta,print,  initialV){
   prob<-NA
   
   # index variables for Q, P, and Delta
-  Qindex<-c("V1", "V2", "V3", "V4")
+  Vindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
   
   # Counter for indicating which character has to be updated
@@ -53,17 +53,15 @@ lik_WSLS<-function (Data, beta,print,  initialV){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      V<-rep(initialQ, times=4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, times=4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
       V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
     }
     
-    Data[t, Qindex]<-V
-    
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(V, beta)
+    p<-softmax(p, beta)
     
     # compute Q, delta, and choice probability for actual choice, only if a choice is computed
     if (Data$response[t]!=0 & !is.na(Data$response[t]) ) {

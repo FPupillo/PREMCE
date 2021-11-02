@@ -1,6 +1,6 @@
 #library(pracma)
 
-fit_PearceHall<-function(data,alphaBound, betaBound,kBound, etaBound, initialQ){
+fit_PearceHall<-function(data,alphaBound, betaBound,kBound, gammaBound, initialV){
   # This function finds the parameters that 
   # minimize the negative log-likelihood
   #
@@ -9,8 +9,8 @@ fit_PearceHall<-function(data,alphaBound, betaBound,kBound, etaBound, initialQ){
   #    alphaBound<- a two-element vector with upper and lower boundaries for the alpha parameter     
   #    betaBound<- a two-element vector with upper and lower boundaries for the beta parameter 
   #    kBound<-two element vector with boundaries for parameter k
-  #    etaBound<- eta parameter's boundsaries
-  #    initialQ<- inital Q values
+  #    gammaBound<- gamma parameter's boundaries
+  #    initialV<- inital V values
   # Output:
   #   A list with: 
   #   [[1]] "alphabetaPAR" : alpha [1], beta [2]parameters that minimize the negative log-likelihood
@@ -19,12 +19,12 @@ fit_PearceHall<-function(data,alphaBound, betaBound,kBound, etaBound, initialQ){
   # -------------
   
   X0<-c(runif(1), rexp(1,1),runif(1), runif(1) )  # rexp generates random numbers from the exponential distributon with mean 1
-  LB<-c(alphaBound[1],betaBound[1], kBound[1], etaBound[1]) # lower boundary
-  UB<-c(alphaBound[2], betaBound[2], kBound[2], etaBound[2])
+  LB<-c(alphaBound[1],betaBound[1], kBound[1], gammaBound[1]) # lower boundary
+  UB<-c(alphaBound[2], betaBound[2], kBound[2], gammaBound[2])
   # Similar to my suggestion about the number of starting points, you should add a variable to "06.Parameter_estimation" 
   # to determine the boundaries
   
-  obfunc<-function(x) lik_PearceHall(data, x[1], x[2], x[3], x[4], 1, initialQ) # this function is similar to the MATLAB "handle" function
+  obfunc<-function(x) lik_PearceHall(data, x[1], x[2], x[3], x[4], 1, initialV) # this function is similar to the MATLAB "handle" function
   
   # Find best-fitting parameters
   NegLL<-optim(X0, obfunc, method = "L-BFGS-B",lower = LB, upper=UB) 

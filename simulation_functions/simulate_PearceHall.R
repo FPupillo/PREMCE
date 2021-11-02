@@ -104,7 +104,6 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
       Data$accuracy[t]<-0
     }
     
-    
     # get the observation as 1 if that category is present, and 0 if it is not
     if (Data$accuracy[t]==1){
       r<-1 

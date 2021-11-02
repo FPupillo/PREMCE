@@ -1,5 +1,5 @@
 simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
-                                        k=NULL, eta = NULL, initialQ){
+                                        k=NULL, eta = NULL, initialV){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model 
   # only the category shown is updated in this version
@@ -23,12 +23,11 @@ simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
   Data$cuedCharacter<-as.character(Data$cuedCharacter)
   #1  "Electronic device & accessory"  2  "Hand labour tool & accessory" 
   # 3 "Kitchen & utensil"     4  "Outdoor activity & sport item"
-  #Data$obj_category<-as.numeric(as.factor(Data$obj_category))
-  
+
   for (n in 1:4){
     
     # Initialize variables: Qs, the expected values
-    Data[[paste("Q", n, sep="")]]<-NA
+    Data[[paste("V", n, sep="")]]<-NA
     
     # Ps (probabilities for each category's choice)
     Data[[paste("P", n, sep="")]]<-NA
@@ -52,22 +51,12 @@ simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
   Data$CPP<-NA
   
   # index variables for Q, P, and Delta
-  Qindex<-c("Q1", "Q2", "Q3", "Q4")
+  Vindex<-c("V1", "V2", "V3", "V4")
   Pindex<-c("P1", "P2", "P3", "P4") 
   # Deltaindex<-c("Delta1", "Delta2", "Delta3", "Delta4")
   # 
   # Counter for indicating which character has to be updated
   count<-rep(0, 2)
-  
-  # convert character as numeric
-  #Data$character<-as.character(Data$cuedCharacter)
-  #Data$cuedCharacter<-as.numeric(Data$cuedCharacter)
-  
-  # for (t in 1:nrow(Data)){
-  #   if(Data$character[t]=="stimuli/m2.jpg"){
-  #     Data$cuedCharacter[t]<-1
-  #   }else{Data$cuedCharacter[t]<-2}
-  # }
   
   # initialise choice probability and counter for the choiceprobability
   prob<-NA
@@ -80,15 +69,15 @@ simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      Q<-rep(initialQ,4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV,4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
-        Q<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Qindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
     }
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(Q, beta)
+    p<-softmax(V, beta)
     
     # make choice according to choice probabilities
     Data$response[t] <- chooseMultinom(p)
@@ -111,7 +100,7 @@ simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
     }
     
         # prediction error
-        delta <- 1 - Q[which(obs==1)]
+        delta <- 1 - V[which(obs==1)]
         
         # assign it to the dataset
         #Data[t, Deltaindex]<-delta
@@ -119,11 +108,11 @@ simulate_RescorlaWagner_obs<-function ( Data,alpha, beta,
         Data$Delta[t]<-delta
         
         # update the q accordingly
-        Q[which(obs==1)]<-Q[which(obs==1)]+ alpha *delta
+        V[which(obs==1)]<-V[which(obs==1)]+ alpha *delta
         
   
   # assign values to the dataset
-  Data[t, Qindex]<-Q
+  Data[t, Vindex]<-V
   Data[t, Pindex]<-p
   
   }

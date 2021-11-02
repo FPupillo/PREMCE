@@ -1,4 +1,4 @@
-lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
+lik_HMM<-function (Data,c, gamma,print, initialPs){
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -33,7 +33,6 @@ lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
   
   for (n in 1:4){
     
-    
     # P probability of the state, given the observation (reward)
     Data[[paste("P_O_S", n, sep="")]]<-NA
     
@@ -46,7 +45,6 @@ lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
   # probability for the choice that participants' made on a trial
   Data$Prob<-NA
 
-  
   # accuracy
   Data$accuracy<-NA
 
@@ -87,9 +85,6 @@ lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
     } else {
       PS_post<-unlist(Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],PSpostindex])
       
-      #PS_pre[1]<-PS_post[1]*(1-gamma)+  gamma*  (PS_post[2]) + gamma*PS_post[3]+gamma*PS_post[4]
-      
-      
       PS_pre[1]<-PS_post[1]*(1-gamma)+PS_post[2]*(gamma/3)+PS_post[3]*(gamma/3)+PS_post[4]*(gamma/3)
       PS_pre[2]<-PS_post[2]*(1-gamma)+PS_post[3]*(gamma/3)+PS_post[4]*(gamma/3)+PS_post[1]*(gamma/3)
       PS_pre[3]<-PS_post[3]*(1-gamma)+PS_post[1]*(gamma/3)+PS_post[2]*(gamma/3)+PS_post[4]*(gamma/3)
@@ -99,7 +94,7 @@ lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
     
     # update choice probabilities using the softmax distribution
-    p<-softmax(PS_pre, beta)
+    #p<-softmax(PS_pre, beta)
     
     # compute Q, delta, and choice probability for actual choice, only if a choice is computed
     if (Data$response[t]!=0 & !is.na(Data$response[t]) ) {
@@ -135,7 +130,7 @@ lik_HMM<-function (Data,c, gamma, beta,print, initialPs){
       # That is the category to updated
       
       # probability only for the response made by participant
-      prob[count2]<-unlist(p[respCounter])
+      prob[count2]<-unlist(PS_pre[respCounter])
       
       # assign it to the dataset
       Data$Prob[t]<- prob[count2]

@@ -65,7 +65,7 @@ simulate_WSLS<-function ( Data, beta, initialV){
     
     # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      V<-rep(initialQ, times = 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
+      V<-rep(initialV, times = 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
     } else{
       V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
     }

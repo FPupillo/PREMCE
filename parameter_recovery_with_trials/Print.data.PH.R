@@ -12,19 +12,10 @@ library(ggpubr)
 
 betalim<-10
 
-model<-"PH"
-Ntrial<-48
+model<-"PHfixk"
+Ntrial<-24
 name<- paste("output_files/parameterRecovery", model, ".", "Ntrial=",  Ntrial,  
              ".initialQ=", 0.25 , sep="")
-
-# retrieve all the files in the folder "cluster"
-# parameterRecov<-vector()
-# files<-list.files("computational_model/cluster/output_files")
-# for (n in 1: length(files)){
-#   currFile<-read.csv(paste0("computational_model/cluster/output_files/",files[n]))
-#   # append it
-#   parameterRecov<-rbind(parameterRecov, currFile)
-# }
 
 # retrieve the file
 parameterRecov<-read.csv(paste0(name, ".csv"))
@@ -36,7 +27,7 @@ plotalpha<-ggplot(parameterRecov, aes(x=simAlpha, y=fitAlpha)) +
   theme_bw()+
   stat_cor(method="pearson")+
   #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
-  ggtitle("alpha parameter")
+  ggtitle("Alpha parameter")
 
 plotbeta<-ggplot(parameterRecov, aes(x=simBeta, y=fitBeta)) + 
   geom_point()+
@@ -46,23 +37,15 @@ plotbeta<-ggplot(parameterRecov, aes(x=simBeta, y=fitBeta)) +
   #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
   ggtitle("Beta parameter")
 
-plotk<-ggplot(parameterRecov, aes(x=simK, y=fitK)) + 
+plotgamma<-ggplot(parameterRecov, aes(x=simEta, y=fitEta)) + 
   geom_point()+
   geom_smooth(method=lm)+
   theme_bw()+
   stat_cor(method="pearson")+
   #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
-  ggtitle("k parameter")
-
-ploteta<-ggplot(parameterRecov, aes(x=simEta, y=fitEta)) + 
-  geom_point()+
-  geom_smooth(method=lm)+
-  theme_bw()+
-  stat_cor(method="pearson")+
-  #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
-  ggtitle("eta parameter")
+  ggtitle("Gamma parameter")
   
-g<-grid.arrange(plotalpha, plotbeta, plotk, ploteta,ncol=2)
+g<-grid.arrange(plotalpha, plotbeta, plotgamma,ncol=2)
 
 arrangeGrob(plotalpha, plotbeta,ncol=2)
 

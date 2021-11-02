@@ -39,7 +39,7 @@ for (n in 1:nrow(Data)){
 # simulate data
 sim<-simulate_PearceHall(Data=Data,alpha=0.5, beta =7, 
            k=0.5, eta = 0.5,
-           initialQ = 0.25)
+           initialV = 0.25)
 
 ggplot(sim, aes(x=trialN))+
   
