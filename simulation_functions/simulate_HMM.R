@@ -149,8 +149,8 @@ simulate_HMM<-function ( Data,c,gamma, initialPs){
     
     # compute bayesian surprise
     # else  
-    Data$surprise[t] = PS_post[1] * log(PS_post[1]/PS_pre[1]) + PS_post[2] * log(PS_post[2]/PS_pre[2]) +
-      PS_post[3] * log(PS_post[3]/PS_pre[3]) + PS_post[4] * log(PS_post[4]/PS_pre[4])  ; 
+    Data$surprise[t] = PS_pre[1] * log(PS_post[1]/PS_pre[1]) + PS_pre[2] * log(PS_post[2]/PS_pre[2]) +
+      PS_pre[3] * log(PS_post[3]/PS_pre[3]) + PS_pre[4] * log(PS_post[4]/PS_pre[4])  ; 
     
     # assign other values to the dataset
     Data[t, PSpreindex]<-PS_pre

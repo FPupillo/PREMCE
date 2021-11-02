@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-# Print graph for parameter recovery for HMM
+# Print graph for parameter recovery for HMM with gamma
 
 # Cerated: ""Thu Oct 28 12:47:39 2021"
 #------------------------------------------------------------------------------#
@@ -12,7 +12,7 @@ library(ggpubr)
 
 betalim<-10
 
-model<-"HMM"
+model<-"HMM_gamma"
 Ntrial<-24
 name<- paste("output_files/parameterRecovery", model, ".", "Ntrial=",  Ntrial,  
              ".initialQ=", 0.25 , sep="")
@@ -20,7 +20,13 @@ name<- paste("output_files/parameterRecovery", model, ".", "Ntrial=",  Ntrial,
 # retrieve the file
 parameterRecov<-read.csv(paste0(name, ".csv"))
 
-
+plotgamma<-ggplot(parameterRecov, aes(x=simGamma, y=fitGamma)) + 
+  geom_point()+
+  geom_smooth(method=lm)+
+  theme_bw()+
+  stat_cor(method="pearson")+
+  #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
+  ggtitle("gamma parameter")
 
 plotc<-ggplot(parameterRecov, aes(x=simC, y=fitC)) + 
   geom_point()+
@@ -30,9 +36,9 @@ plotc<-ggplot(parameterRecov, aes(x=simC, y=fitC)) +
   #stat_cor(method = "pearson", label.x = 3, label.y = 30)+
   ggtitle("c parameter")
   
-g<-grid.arrange(  plotc, ncol=1)
+g<-grid.arrange(  plotgamma, plotc, ncol=2)
 
-arrangeGrob(plotalpha, plotbeta,ncol=1)
+arrangeGrob(plotgamma, plotc,ncol=2)
 
 # save
 ggsave(file=paste0("figures/ParameterRecovery_", model, "betalimit=", betalim,  ".jpg"), g)

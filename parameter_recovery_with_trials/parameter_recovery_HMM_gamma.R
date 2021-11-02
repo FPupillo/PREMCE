@@ -13,7 +13,7 @@ source(("helper_functions/softmax.R"))
 source(("helper_functions/chooseMultinom.R"))
 source(("helper_functions/BICcompute.R"))
 source("likelihood_functions/lik_HMM.R")
-source("fitting_functions/fit_HMM.R")
+source("fitting_functions/fit_HMM_gamma.R")
 source("helper_functions/getCat.R")
 source("helper_functions/preSim.R")
 source("helper_functions/getcorrCat.R")
@@ -29,23 +29,23 @@ categN<-4
 #------------------------------------------------------------------------------#
 lengthparam<-10
 
-sims<-10
+sims<-3
 
 cseq<-seq(0,1, length.out =lengthparam)
 
-#betaseq<-seq(1,10, length.out=lengthparam)
+gammaseq<-seq(0.1,0.3, length.out=lengthparam)
 
-data<-matrix(NA, nrow=1,ncol = 3)
+data<-matrix(NA, nrow=1,ncol = 5)
 
 df<-data.frame(data)
 
-names(df)<-c("simC", "fitC","BIC")
+names(df)<-c("simC", "fitC","simGamma", "fitGamma", "BIC")
 
 model<-simulate_HMM
 
-fit<-fit_HMM
+fit<-fit_HMM_gamma
 
-modname<-as.character("HMM")
+modname<-as.character("HMM_gamma")
 
 name<- paste("output_files/parameterRecovery", modname, ".Ntrial=",Ntrial, 
              ".initialQ=", 0.25 , sep="")
@@ -58,10 +58,9 @@ count<-1
 # progress bar
 pb<-txtProgressBar(min=0, max=(lengthparam)*sims, style =3)
 
-
 for (sim in 1:sims){
 for (c in 1:length(cseq)){
-  #for (b in 1:length(betaseq)){
+  for (gamma in 1:length(gammaseq)){
 
     # generate the task
     Data<-taskSim(Pcong, Ntrial, Ncharacter, switchN, categN)
@@ -82,9 +81,8 @@ for (c in 1:length(cseq)){
       
     } else if (!is.null(formals(model)$c)){
       
-      
       # simulate data with the HMM
-      sim<-model(Data=Data,c=cseq[c], gamma =0.1,
+      sim<-model(Data=Data,c=cseq[c], gamma =gammaseq[gamma],
                  initialPs = 0.25)
       
     } else{ 
@@ -105,17 +103,17 @@ for (c in 1:length(cseq)){
     sim$respCat<-substr(categ[sim$response], 9, nchar(categ[sim$response])-4)
     
     # now fit the data
-    est<-fit(data=sim, cBound = c(0,1),
+    est<-fit(data=sim, cBound = c(0,1), gammaBound = c(0.1,0.3),
              initialPs =0.25)
     
     estC<-est$alphabetaPAR[1]
     
-    #estBeta<-est$alphabetaPAR[2]
+    estGamma<-est$alphabetaPAR[2]
     
     temp<-read.csv( paste0(name, ".csv"))
     
     #append the data
-    temp[nrow(temp)+1, ]<-c(cseq[c], estC, 
+    temp[nrow(temp)+1, ]<-c(cseq[c], estC, gammaseq[gamma], estGamma,
                         est$BIC)
     
     #write it
@@ -127,4 +125,4 @@ for (c in 1:length(cseq)){
     
   }
     }
-
+}
