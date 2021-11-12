@@ -8,13 +8,13 @@ setwd(dirname(getwd()))
 
 #soruce the functions
 source("helper_functions/taskSim.R")
-source("simulation_functions/simulate_RescorlaWagner_EC.R")
+source("simulation_functions/simulate_RescorlaWagner_IC.R")
 source("helper_functions/update_RW.R")
 source(("helper_functions/softmax.R"))
 source(("helper_functions/chooseMultinom.R"))
 source(("helper_functions/BICcompute.R"))
-source("likelihood_functions/lik_RescorlaWagner_EC.R")
-source("fitting_functions/fit_RescorlaWagner_EC.R")
+source("likelihood_functions/lik_RescorlaWagner_IC.R")
+source("fitting_functions/fit_RescorlaWagner_IC.R")
 source("helper_functions/getCat.R")
 source("helper_functions/preSim.R")
 source("helper_functions/getcorrCat.R")
@@ -42,11 +42,11 @@ df<-data.frame(data)
 
 names(df)<-c("simCAlpha", "fitAlpha","simBeta", "fitBeta","BIC")
 
-model<-simulate_RescorlaWagner_EC
+model<-simulate_RescorlaWagner_IC
 
-fit<-fit_RescorlaWagner_EC
+fit<-fit_RescorlaWagner_IC
 
-modname<-as.character("RW_EC")
+modname<-as.character("RW_IC")
 
 name<- paste("output_files/parameterRecovery", modname, ".Ntrial=",Ntrial, 
              ".initialQ=", 0.25 , sep="")
@@ -93,15 +93,15 @@ for (a in 1:length(alphaseq)){
     est<-fit(data=sim, alphaBound = c(0,1), betaBound = c(0,10),
              initialV =0.25)
     
-    estC<-est$alphabetaPAR[1]
+    estAlpha<-est$alphabetaPAR[1]
     
-    #estBeta<-est$alphabetaPAR[2]
+    estBeta<-est$alphabetaPAR[2]
     
     temp<-read.csv( paste0(name, ".csv"))
     
     #append the data
-    temp[nrow(temp)+1, ]<-c(cseq[c], estC, 
-                        est$BIC)
+    temp[nrow(temp)+1, ]<-c(alphaseq[a], estAlpha,betaseq[b],estBeta,
+                            est$BIC)
     
     #write it
     write.csv(temp, paste0(name, ".csv"), row.names = F)

@@ -2,7 +2,7 @@
 # simulating trials switch points and character - RW_IC
 # created: "Tue Oct 26 14:26:25 2021"
 #------------------------------------------------------------------------------#
-
+rm(list=ls())
 #setwd(dirname(getwd()))
 setwd(dirname(getwd()))
 
@@ -93,14 +93,14 @@ for (a in 1:length(alphaseq)){
     est<-fit(data=sim, alphaBound = c(0,1), betaBound = c(0,10),
              initialV =0.25)
     
-    estC<-est$alphabetaPAR[1]
+    estAlpha<-est$alphabetaPAR[1]
     
-    #estBeta<-est$alphabetaPAR[2]
+    estBeta<-est$alphabetaPAR[2]
     
     temp<-read.csv( paste0(name, ".csv"))
     
     #append the data
-    temp[nrow(temp)+1, ]<-c(cseq[c], estC, 
+    temp[nrow(temp)+1, ]<-c(alphaseq[a], estAlpha,betaseq[b],estBeta,
                         est$BIC)
     
     #write it
