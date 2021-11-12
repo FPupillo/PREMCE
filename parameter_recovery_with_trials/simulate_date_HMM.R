@@ -5,15 +5,16 @@
 rm(list=ls())
 
 #soruce the functions
-source("simulate_data/taskSim2.R")
-source("computational_model/simulation_functions/simulate_HMM.R")
-source(("computational_model/softmax.R"))
-source(("computational_model/chooseMultinom.R"))
-source(("computational_model/BICcompute.R"))
+source("helper_functions/taskSim.R")
+source("simulation_functions/simulate_HMM.R")
+source(("helper_functions/softmax.R"))
+source(("helper_functions/chooseMultinom.R"))
+source(("helper_functions/BICcompute.R"))
+source("likelihood_functions/lik_HMM.R")
+source("fitting_functions/fit_HMM_gamma.R")
 source("helper_functions/getCat.R")
 source("helper_functions/preSim.R")
 source("helper_functions/getcorrCat.R")
-source("simulate_data/taskSim2.R")
 
 #------------------------------------------------------------------------------#
 # parameters
@@ -35,7 +36,7 @@ for (n in 1:nrow(Data)){
 }
 
 # simulate data
-sim<-simulate_HMM(Data=Data,c=0.5, beta =7, 
+sim<-simulate_HMM(Data=Data,c=0.4, 
            gamma=0.1, 
            initialPs = 0.25)
 
@@ -49,8 +50,13 @@ ggplot(sim, aes(x=trialN))+
   theme_bw()+
   
   geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+  labs(y = "Estimated choice probabilities")
+  
+ggsave(filename = "figures/estimatedCP_HMM_c=0.4_gamma=0.1.jpg") 
+
+
   #facet_grid(butterfly~SubNum)+
-  facet_wrap(character~., ncol = 3)
+ # facet_wrap(character~., ncol = 3)
 
 # now susprise
 ggplot(sim, aes(x=trialN))+
@@ -62,10 +68,14 @@ ggplot(sim, aes(x=trialN))+
    geom_line(aes(y=surprise), color = "red")+
   theme_bw()+
   
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))
+  
   #facet_grid(butterfly~SubNum)+
-  facet_wrap(character~., ncol = 3)
+  #facet_wrap(character~., ncol = 3)
 
+  ggsave(filename = "figures/surprise_HMM_c=0.4_gamma=0.1.jpg") 
+
+  
 # now entropy
 ggplot(sim, aes(x=trialN))+
   
@@ -76,9 +86,12 @@ ggplot(sim, aes(x=trialN))+
   geom_line(aes(y=entropy), color = "red")+
   theme_bw()+
   
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))
   #facet_grid(butterfly~SubNum)+
-  facet_wrap(character~., ncol = 3)
+  #facet_wrap(character~., ncol = 3)
+
+ggsave(filename = "figures/entropy_HMM_c=0.4_gamma=0.1.jpg") 
+
 
 ggplot(sim, aes(x=trialN))+
   
@@ -92,3 +105,5 @@ ggplot(sim, aes(x=trialN))+
   geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
   #facet_grid(butterfly~SubNum)+
   facet_wrap(character~., ncol = 3)
+
+ggsave(filename = "figures/entropy_HMM_c=0.4_gamma=0.1.jpg") 
