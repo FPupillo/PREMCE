@@ -1,4 +1,5 @@
 lik_HMM<-function (Data,c, gamma,print, initialPs){
+  #----------------------------------------------------------------------------#
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -10,14 +11,13 @@ lik_HMM<-function (Data,c, gamma,print, initialPs){
   #   c : probability that the reward indicated that one state is the true state
   #   gamma: 
   #   print: 1: return only the negative log-likelihood; 
-  #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
-  #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
-  #           of choosing category 1), 9:"P2", 10: "P3"
+  #          2: return all values
   #   initialQ: value of the inital Q
   #
   # Output:
-  #   Negative Log Likelihood
-  # -------------
+  #   Negative Log Likelihood (if print = 1)
+  #   All the values (if print = 2)
+  #----------------------------------------------------------------------------#
   
   # convert the object category into numeric variable
   categ<-c("Outdoor activity & sport item", "Kitchen & utensil",
@@ -190,10 +190,7 @@ NegLL<--sum(log(Data$Prob), na.rm=T)
 
 if (print ==1){
   return(NegLL)
-}else if ( print==2){
-  return (list("Negative LogLikel"=NegLL, "Q1"= Data$Q1,"Q2"= Data$Q2,"Q3"= Data$Q3,"Q4"= Data$Q4,
-               "Delta"= Data$Delta,"P1"=Data$P1,"P2"= Data$P2, "P3"=Data$P3 , "P4"=Data$P4))
-} else if(print==3){
+} else if(print==2){
   return(Data)}
 }
 

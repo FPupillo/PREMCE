@@ -1,4 +1,5 @@
 lik_PearceHall<-function (Data,alpha_0, beta, k, gamma,print,  initialV){
+  #----------------------------------------------------------------------------#
   # This function computes the likelihood of the participants'
   # choices conditional on the Rescorla Wagner model = only value of the choice
   # is updated in this model
@@ -10,14 +11,13 @@ lik_PearceHall<-function (Data,alpha_0, beta, k, gamma,print,  initialV){
   #   k : weight of associability
   #   gamma : weight between associability and PE
   #   print: 1: return only the negative log-likelihood; 
-  #          2: return 1: "Negative LogLikel"; 2:"Q1"; 3:"Q2"; 4:"Q3"
-  #          5: "Delta1"; 6: "Delta2"; 7: "Delta3", 8: "P1" (Probability
-  #           of choosing category 1), 9:"P2", 10: "P3"
+  #          2: return all data
   #   initialV: value of the inital V
   #
   # Output:
-  #   Negative Log Likelihood
-  # -------------
+  #   Negative Log Likelihood (if print = 1)
+  #   All the values (if print = 2)
+  #----------------------------------------------------------------------------#
   
   # convert the object category into character variables
   categ<-levels(as.factor(Data$obj_category))
@@ -153,10 +153,7 @@ NegLL<--sum(log(Data$Prob), na.rm=T)
 
 if (print ==1){
   return(NegLL)
-}else if ( print==2){
-  return (list("Negative LogLikel"=NegLL, "Q1"= Data$Q1,"Q2"= Data$Q2,"Q3"= Data$Q3,"Q4"= Data$Q4,
-               "Delta"= Data$Delta,"P1"=Data$P1,"P2"= Data$P2, "P3"=Data$P3 , "P4"=Data$P4))
-} else if(print==3){
+} else if(print==2){
   return(Data)}
 }
 

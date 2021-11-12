@@ -1,30 +1,35 @@
-#library(pracma)
 
 fit_PearceHall<-function(data,alphaBound, betaBound,kBound, gammaBound, initialV){
+  #----------------------------------------------------------------------------#
   # This function finds the parameters that 
   # minimize the negative log-likelihood
   #
   # Input    
   #    Data: a long dataset where each row represents a trial. 
-  #    alphaBound<- a two-element vector with upper and lower boundaries for the alpha parameter     
-  #    betaBound<- a two-element vector with upper and lower boundaries for the beta parameter 
+  #    alphaBound<- a two-element vector with upper and lower boundaries 
+  #                 for the alpha parameter     
+  #    betaBound<- a two-element vector with upper and lower boundaries 
+  #                 for the beta parameter 
   #    kBound<-two element vector with boundaries for parameter k
   #    gammaBound<- gamma parameter's boundaries
   #    initialV<- inital V values
   # Output:
   #   A list with: 
-  #   [[1]] "alphabetaPAR" : alpha [1], beta [2]parameters that minimize the negative log-likelihood
-  #   [[2]] "loglikel": log-likelihood for the model with the parameters of best fit
-  #   [[3]] "BIC" : Bayesian Information Criterion for the model with the parameters of best fit
-  # -------------
+  #   [[1]] "alphabetaPAR" : alpha [1], beta [2]parameters that minimize
+  #           the negative log-likelihood
+  #   [[2]] "loglikel": log-likelihood for the model with the parameters 
+  #           of best fit
+  #   [[3]] "BIC" : Bayesian Information Criterion for the model with the 
+  #           parameters of best fit
+  #----------------------------------------------------------------------------#
   
-  X0<-c(runif(1), rexp(1,1),runif(1), runif(1) )  # rexp generates random numbers from the exponential distributon with mean 1
+  X0<-c(runif(1), rexp(1,1),runif(1), runif(1) )  
+  # rexp generates random numbers from the exponential distributon with mean 1
   LB<-c(alphaBound[1],betaBound[1], kBound[1], gammaBound[1]) # lower boundary
   UB<-c(alphaBound[2], betaBound[2], kBound[2], gammaBound[2])
-  # Similar to my suggestion about the number of starting points, you should add a variable to "06.Parameter_estimation" 
-  # to determine the boundaries
-  
-  obfunc<-function(x) lik_PearceHall(data, x[1], x[2], x[3], x[4], 1, initialV) # this function is similar to the MATLAB "handle" function
+
+  # this function is similar to the MATLAB "handle" function
+  obfunc<-function(x) lik_PearceHall(data, x[1], x[2], x[3], x[4], 1, initialV) 
   
   # Find best-fitting parameters
   NegLL<-optim(X0, obfunc, method = "L-BFGS-B",lower = LB, upper=UB) 
