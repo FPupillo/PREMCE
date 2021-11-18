@@ -1,17 +1,17 @@
 #------------------------------------------------------------------------------#
-# simulating trials switch points and character and analyse results - Pearce Hall 
+# simulating trials switch points and character and analyse results - Pearce Hall2
 # created: "Thu Oct 28 16:50:46 2021"
 #------------------------------------------------------------------------------#
 rm(list=ls())
 
 #soruce the functions
 source("helper_functions/taskSim.R")
-source("simulation_functions/simulate_PearceHall.R")
+source("simulation_functions/simulate_PearceHall2.R")
 source(("helper_functions/softmax.R"))
 source(("helper_functions/chooseMultinom.R"))
 source(("helper_functions/BICcompute.R"))
-source("likelihood_functions/lik_PearceHall.R")
-source("fitting_functions/fit_PearceHall.R")
+source("likelihood_functions/lik_PearceHall2.R")
+source("fitting_functions/fit_PearceHall2.R")
 source("helper_functions/getCat.R")
 source("helper_functions/preSim.R")
 source("helper_functions/getcorrCat.R")
@@ -36,7 +36,7 @@ for (n in 1:nrow(Data)){
 }
 
 # simulate data
-sim<-simulate_PearceHall(Data=Data,alpha=0.5, beta =4,k=1, gamma=0.3 ,
+sim<-simulate_PearceHall2(Data=Data,alpha=0.5, beta =7, 
 
            initialV = 0.25)
 
@@ -49,9 +49,9 @@ ggplot(sim, aes(x=trialN))+
   # geom_line(aes(y=Delta), color = "red")+
   theme_bw()+
   
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
   #facet_grid(butterfly~SubNum)+
-  #facet_wrap(character~., ncol = 3)
+  facet_wrap(character~., ncol = 3)
 
 # now Learning rate
 ggplot(sim, aes(x=trialN))+
@@ -63,9 +63,9 @@ ggplot(sim, aes(x=trialN))+
    geom_line(aes(y=alpha), color = "red")+
   theme_bw()+
   
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))
+  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
   #facet_grid(butterfly~SubNum)+
-  f#acet_wrap(character~., ncol = 3)
+  facet_wrap(character~., ncol = 3)
 
 ggplot(sim, aes(x=trialN))+
   

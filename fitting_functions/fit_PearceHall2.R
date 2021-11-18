@@ -1,5 +1,5 @@
 
-fit_PearceHall<-function(data,alphaBound, betaBound,kBound, gammaBound, initialV){
+fit_PearceHall2<-function(data,alphaBound, betaBound, initialV){
   #----------------------------------------------------------------------------#
   # This function finds the parameters that 
   # minimize the negative log-likelihood
@@ -23,13 +23,13 @@ fit_PearceHall<-function(data,alphaBound, betaBound,kBound, gammaBound, initialV
   #           parameters of best fit
   #----------------------------------------------------------------------------#
   
-  X0<-c(runif(1), rexp(1,1), runif(1) )  
+  X0<-c(runif(1), rexp(1,1) )  
   # rexp generates random numbers from the exponential distributon with mean 1
-  LB<-c(alphaBound[1],betaBound[1],  gammaBound[1]) # lower boundary
-  UB<-c(alphaBound[2], betaBound[2],  gammaBound[2])
+  LB<-c(alphaBound[1],betaBound[1] )# lower boundary
+  UB<-c(alphaBound[2], betaBound[2])
 
   # this function is similar to the MATLAB "handle" function
-  obfunc<-function(x) lik_PearceHall(data, x[1], x[2], 1, x[4], 1, initialV) 
+  obfunc<-function(x) lik_PearceHall2(data, x[1], x[2], 1, initialV) 
   
   # Find best-fitting parameters
   NegLL<-optim(X0, obfunc, method = "L-BFGS-B",lower = LB, upper=UB) 

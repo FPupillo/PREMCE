@@ -1,4 +1,5 @@
-simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
+simulate_PearceHall2<-function ( Data,alpha_0, beta,  initialV){
+  # ---------------------------------------------------------------------------#
   # This function computes the likelihood of the participants'
   # choices conditional on the Pearce Hall model 
   #
@@ -6,13 +7,11 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
   #   Data: data containing the structure of the task
   #   alpha_0: initial associability parameter 
   #   beta:  beta parameter
-  #   k : weight of associability
-  #   gamma : weight between associability and PE
   #   initialV: value of the inital V
   #
   # Output:
   #   dastaframe with $response and $object_cat
-  # -------------
+  # ---------------------------------------------------------------------------#
   
   # convert the object category into numeric variable
   categ<-levels(as.factor(Data$obj_category))
@@ -72,14 +71,23 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
     # update the counter
     Murkcounter<-which(murks==Data$cuedCharacter[t])
     
-    # The following loop retrieves the Q values of the butterfly that corresponds to the current trial (time t).
+    # The following loop retrieves the Q values of the butterfly that c#
+    # orresponds to the current trial (time t).
     if (count[Murkcounter]==0){
-      V<-rep(initialV, 4) # if it is the first time that butterfly is shown, the Qs are at their initial value
-      alpha<-alpha_0
+      V<-rep(initialV, 4) # if it is the first time that butterfly is shown,
+      # the Qs are at their initial value
+      #delta_tmin1<-1
+      alpha<-1
     } else{
-      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],Vindex] # if it is not the first time that butterfly is shown, retrieve the Qs of the last trial of that butterfly
+      V<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],
+                                                          Vindex] # if it is not
+      # the first time that butterfly is shown, retrieve the Qs of the last 
+      # trial of that butterfly
       # retrieve the prediciton error
-      #alpha<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"alpha"] 
+      alpha<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"alpha"] 
+      # retrieve accuracy at the previous trial
+     # delta_tmin1<-Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],"Delta"] 
+
     }
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
@@ -115,10 +123,10 @@ simulate_PearceHall<-function ( Data,alpha_0, beta, k, gamma,  initialV){
     delta <- r -V[Data$response[t]]
     
     # update Q
-    V[Data$response[t]]<- V[Data$response[t]]+k*alpha*delta
+    V[Data$response[t]]<- V[Data$response[t]]+alpha*delta
     
-    # update alpha
-    alpha<- gamma *abs(delta) + (1-gamma) * alpha
+    # update alpha as equation (8) in Pearce & Hall
+    alpha<- abs(unlist(delta))
     
     # assign delta and alpha to the dataset
     Data$Delta[t]<-delta

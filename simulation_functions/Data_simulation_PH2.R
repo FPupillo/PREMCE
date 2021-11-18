@@ -12,10 +12,10 @@ library(ggplot2)
 library(dplyr)
 library(gridExtra)
 
-source("computational_model/simulation_functions/simulate_PearceHall.R")
-source(("computational_model/softmax.R"))
-source(("computational_model/chooseMultinom.R"))
-source(("computational_model/BICcompute.R"))
+source("simulation_functions/simulate_PearceHall2.R")
+source(("helper_functions/softmax.R"))
+source(("helper_functions/chooseMultinom.R"))
+source(("helper_functions/BICcompute.R"))
 source(("helper_functions/cumAcc.R"))
 source("helper_functions/getOpt.R")
 source("helper_functions/isOpt.R")
@@ -23,29 +23,7 @@ source("helper_functions/perOpt.R")
 source("helper_functions/getCatresp.R")
 
 
-#------------------------------------------------------------------------------#
-# simulating trials switch points and character and analyse results - Pearce Hall 
-# created: "Thu Oct 28 16:50:46 2021"
-#------------------------------------------------------------------------------#
-rm(list=ls())
-
-#soruce the functions
 source("helper_functions/taskSim.R")
-source("simulation_functions/simulate_PearceHall.R")
-source(("helper_functions/softmax.R"))
-source(("helper_functions/chooseMultinom.R"))
-source(("helper_functions/BICcompute.R"))
-source("likelihood_functions/lik_PearceHall.R")
-source("fitting_functions/fit_PearceHall.R")
-source("helper_functions/getCat.R")
-source("helper_functions/preSim.R")
-source("helper_functions/getcorrCat.R")
-source("helper_functions/getOpt.R")
-source("helper_functions/isOpt.R")
-source("helper_functions/perOpt.R")
-source("helper_functions/cumAcc.R")
-
-
 
 #------------------------------------------------------------------------------#
 # parameters
@@ -57,6 +35,7 @@ switchN<-3
 categN<-4
 #------------------------------------------------------------------------------#
 
+# simulate data
 Data<-taskSim(Pcong, Ntrial, Ncharacter, switchN, categN)
 
 # prepare data
@@ -66,42 +45,34 @@ for (n in 1:nrow(Data)){
   Data[n,1:4]<-paste0("stimuli/",Data[n,1:4], ".png")
 }
 
-# simulate behaviour at different alpha values and beta
-sims<-5
+#different alpha values and beta
+sims<-30
 
-# parameter length
-lengthparam<-5
 # virtual part
 part<-1
 
 # store them in a data frame
 simData<-vector()
 
-# randomly sample from that
-alphaseq<-seq(0.1,1, length.out=lengthparam)
+as<-seq(0.1, 1, length.out = 5)
 
-# beta is sampled from the exponential distribution
-betaseq<-seq(0.1,20, length.out=lengthparam)
+beta<-seq(1, 20, length.out = 5)
 
-# now gamma
-gammaseq<-seq(0.1,1, length.out=lengthparam)
-
+#etas<-seq(0, 1, length.out = 5)
 # create dataframe for performance
-simPerf<-as.data.frame(matrix(NA, ncol = 6, nrow = sims*lengthparam^3))
-names(simPerf)<-c("part","alpha", "beta", "k", "gamma", "perOptim")
+simPerf<-as.data.frame(matrix(NA, ncol = 4, nrow = sims*5*5))
+names(simPerf)<-c("part","alpha", "beta", "perOptim")
 
 # simulate data    
-pb<-txtProgressBar(min=0, max=sims*lengthparam^3 )
+pb<-txtProgressBar(min=0, max=sims*length(beta)*length(alpha) )
 
 for (simul in 1:sims){
-for (a in alphaseq){
-for (b in betaseq){
-for (gamma in gammaseq){
+  for (a in as){
+  for (b in beta){{
         
       
-  sim<-simulate_PearceHall(Data=Data, alpha_0 =a , 
-                           beta = b, k=1, 
-                           gamma = gamma, initialV = 0.25)
+  sim<-simulate_PearceHall2(Data=Data, alpha_0 =a , beta = b, 
+                   initialV = 0.25)
 
   # calculate percentage optimal choice
   # rename variables
@@ -119,13 +90,10 @@ for (gamma in gammaseq){
  
  sim<-perOpt(sim)
  
- sim$alpha<-a
+ sim$a<-a
  sim$beta<-b
- sim$k<-1
  
- sim$gamma<-gamma
- 
- sim$simN<-simul
+ sim$simN<-sims[simul]
  
  sim$part<-part
  
@@ -136,8 +104,7 @@ for (gamma in gammaseq){
  simPerf$alpha[part]<-a
  
  simPerf$beta[part]<-b
- simPerf$k[part]<-1
- simPerf$gamma[part]<-gamma
+
  simPerf$perOptim[part]<-sim$perOptimalChoice[nrow(sim)]
  
  part<-part+1
@@ -147,46 +114,47 @@ for (gamma in gammaseq){
  
 }
 }
-}
-}
+  }
+  }
 
 
 # save the simulation
 
 # save the data
-#save(list = c("simPerf", "simData"), file = "output_files/simulationData_PH.Rdata")
-#load("output_files/simulationData_PH.Rdata")
+#save(list = c("simPerf", "simData"), file = "output_files/simulationData_PH2.Rdata")
+load("output_files/simulationData_PH.Rdata")
 
 # summarise it first
 Datawide<- simData %>%
-  group_by( trialN, alpha, beta, gamma) %>%
+  group_by( trialN, a, beta) %>%
   summarise(mean = mean(perOptimalChoice), sd = sd(perOptimalChoice)) 
 
-Datawide$alpha<-as.factor(Datawide$alpha)
+Datawide$a<-as.factor(Datawide$a)
 
 Datawide$beta<-as.factor(Datawide$beta)
 
-ggplot(Datawide, aes(x = trialN , y =mean, group = alpha, colour = alpha)) +
-  geom_vline(xintercept = c(Ntrial, Ntrial*2,Ntrial*3))+
-  
-  #stat_summary(fun.y="mean",geom="line") +
-  geom_line()+
-  facet_wrap(gamma~beta)
 
 ggplot(Datawide, aes(x = trialN , y =mean, group = a, colour = a)) +
   geom_vline(xintercept = c(Ntrial, Ntrial*2,Ntrial*3))+
   
   #stat_summary(fun.y="mean",geom="line") +
   geom_line()+
-  facet_wrap(eta~k)
+  facet_wrap(.~beta)
+
+ggplot(Datawide, aes(x = trialN , y =mean, group = a, colour = a)) +
+  geom_vline(xintercept = c(Ntrial, Ntrial*2,Ntrial*3))+
+  
+  #stat_summary(fun.y="mean",geom="line") +
+  geom_line()+
+  facet_wrap(.~beta)
 
 
 #ggsave("output_files/simulatedData_RWfeedb.jpg")
   
 # now create the before/after change point graphs
 AccData<-simData  %>%
-  group_by(part, beta,switch_cond)  %>%
-  mutate(befAft=c(rep("afterCP", times=12), rep("beforeCP", times=12)))
+  group_by(part,switch_cond)  %>%
+  mutate(befAft=c(rep(12), rep("beforeCP", times=12)))
 
 
 ggplot(AccData, aes(befAft, isoptimal))+
@@ -231,7 +199,7 @@ p1<-ggplot(data = simPerfAgg, aes(x = alpha, y = beta, fill = perOptim))+
 # plot line graph
 p2<-ggplot(data=simPerfAgg, aes(x=beta,y=perOptim, color = alpha, group=alpha)) + 
   theme_bw() + 
- geom_errorbar(aes(ymin = lowerSE, ymax = upperSE), width = 1) + 
+  geom_errorbar(aes(ymin = lowerSE, ymax = upperSE), width = 1) + 
   geom_line() + scale_color_continuous(name = "learning rate") 
 
 p3<-ggplot(data=simPerfAgg, aes(x=alpha,y=perOptim, color=beta, group=beta)) + 
@@ -239,16 +207,15 @@ p3<-ggplot(data=simPerfAgg, aes(x=alpha,y=perOptim, color=beta, group=beta)) +
   geom_errorbar(aes(ymin = lowerSE, ymax = upperSE)) + 
   geom_line() + scale_color_continuous(name = "beta") 
 
+
 # arrange the two
 grid.arrange(p1, p2, p3,ncol=2)
 
 ggsave("output_files/optimalperf.jpg")
   
-
 # now for only one simulation
-sim<-simulate_PearceHall(Data=Data,
-                          alpha =0.6 , beta = 5, k=1, gamma=0.1,  initialV = 0.25)
-
+sim<-simulate_PearceHall2(Data=Data,
+                                    alpha =0.75 , beta = 5,  initialV = 0.25)
 ggplot(sim, aes(x=trialN))+
   
   geom_line(aes(y=P1), size = 1.5, color = "blue")+
