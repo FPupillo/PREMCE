@@ -1,0 +1,16 @@
+Hi Lei, 
+I am trying to model a probabilistic task with change points in which participants have to choose among four possible options. One of the four choice is correct more frequently than the other. After the change points, the probability of the correct choice changes, so that a different choice is the correct one  more frequently.
+I think that the  Hidden Markov Model (HMM) used in the Kreis et al. (2021) paper published in Schizophrenia Research could be a good candidate for taking into account the probability that a  change point has occurred. 
+However, I struggled to adapt the version described in the paper, which is thought for a task with a binary choice, to a task where participants can choose between 4 different options. 
+In the HMM model, the assumption is that participants make their choice depending on their beliefs about the current state, which in turn
+is influenced by the probability of the state to change. 
+In the HMM model used in the Kreis et al. (2021), the task describes states where either the left stimulus or the right stimulus is more common. 
+The belief distribution over the different states are inferred from observation of action-reward pairs (O={a,r}). A participants' estimation of such an action-outcome pair is then represented by a hidden state variable S. 
+The prior probability of one state pS before observing an outcome, is pS(left stimulus more common) = pS(left stimulus more common) * (1-gamma) + pS(right stimulus more common) *gamma, and pS(righ stimulus more common)= 1 - pS(left stimulus more common). 
+My first question would be how the prior probability would look like in a case where there are four options instead than two. 
+Also, the probability of observing an outcome given a state depends on a further parameter  "c" (or another additional parameter d, but we are assuming c=d for the sake of simplicity). 
+This parameter modulates the probability of a state as 0.5 * c if the option chosen was the correct one and also the one related to that state, while it is 1-c in case the choice positively rewarded was the other one. In case that the option chose was the incorrect one, the probability are inverted: 0.5* (1-c) for the chosen one, and c for the unchosen. 
+My second question would be how to compute these pro
+
+
+I was trying to implement a version of this model for a task where there are 4 choices. How do the probabilities look like? I was wondering whether 
