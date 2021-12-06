@@ -78,11 +78,11 @@ simulate_HMM<-function ( Data,c,gamma, initialPs){
 
       PS_post<-unlist(Data[Data$cuedCharacter==Data$cuedCharacter[t],][count[Murkcounter],PSpostindex])
       
-      PS_pre[1]<-PS_post[1]*(1-gamma)+PS_post[2]*(gamma/3)+PS_post[3]*(gamma/3)+PS_post[4]*(gamma/3)
-      PS_pre[2]<-PS_post[2]*(1-gamma)+PS_post[3]*(gamma/3)+PS_post[4]*(gamma/3)+PS_post[1]*(gamma/3)
-      PS_pre[3]<-PS_post[3]*(1-gamma)+PS_post[1]*(gamma/3)+PS_post[2]*(gamma/3)+PS_post[4]*(gamma/3)
-      PS_pre[4]<-PS_post[4]*(1-gamma)+PS_post[1]*(gamma/3)+PS_post[2]*(gamma/3)+PS_post[3]*(gamma/3)
-      
+      PS_pre[1]<-PS_post[1]*(1-(3*gamma))+PS_post[2]*(gamma)+PS_post[3]*(gamma)+PS_post[4]*(gamma)
+      PS_pre[2]<-PS_post[1]*(gamma)+PS_post[2]*(1-3*gamma)+PS_post[3]*(gamma)+PS_post[4]*(gamma)
+      PS_pre[3]<-PS_post[1]*(gamma)+PS_post[2]*(gamma)+PS_post[3]*(1-3*gamma)+PS_post[4]*(gamma)
+      PS_pre[4]<-PS_post[1]*(gamma)+PS_post[2]*(gamma)+PS_post[3]*(gamma)+PS_post[4]*(1-3*gamma)
+    
     }
 
     
@@ -122,16 +122,16 @@ simulate_HMM<-function ( Data,c,gamma, initialPs){
     # --> the probability of actually observing this outcome
     
     if (r == 1) {
-      P_O_S1 = 0.25 * ( ifelse(Data$response[t] == 1, c, (1-c)/3))
-      P_O_S2 = 0.25 * ( ifelse(Data$response[t] == 2, c, (1-c)/3))
-      P_O_S3 = 0.25 * ( ifelse(Data$response[t] == 3, c, (1-c)/3))
-      P_O_S4 = 0.25 * ( ifelse(Data$response[t] == 4, c, (1-c)/3))
+      P_O_S1 =  ( ifelse(Data$response[t] == 1, c, (1-c)/3))
+      P_O_S2 =  ( ifelse(Data$response[t] == 2, c, (1-c)/3))
+      P_O_S3 =( ifelse(Data$response[t] == 3, c, (1-c)/3))
+      P_O_S4 =  ( ifelse(Data$response[t] == 4, c, (1-c)/3))
       
     } else if (r== 0) {
-      P_O_S1 = 0.25 * ( ifelse(Data$response[t] == 1, (1-c)/3, c))
-      P_O_S2 = 0.25 * ( ifelse(Data$response[t] == 2, (1-c)/3, c))
-      P_O_S3 = 0.25* ( ifelse(Data$response[t] == 3, (1-c)/3, c))
-      P_O_S4 = 0.25 * ( ifelse(Data$response[t] == 4, (1-c)/3, c))
+      P_O_S1 = ( ifelse(Data$response[t] == 1, 1-c, c/3))
+      P_O_S2 = ( ifelse(Data$response[t] == 2, 1-c, c/3))
+      P_O_S3 =  ( ifelse(Data$response[t] == 3, 1-c, c/3))
+      P_O_S4 =  ( ifelse(Data$response[t] == 4, 1-c, c/3))
     }
     
     # State belief update using Bayesian rule, after observing the outcome
@@ -149,8 +149,8 @@ simulate_HMM<-function ( Data,c,gamma, initialPs){
     
     # compute bayesian surprise
     # else  
-    Data$surprise[t] = PS_pre[1] * log(PS_post[1]/PS_pre[1]) + PS_pre[2] * log(PS_post[2]/PS_pre[2]) +
-      PS_pre[3] * log(PS_post[3]/PS_pre[3]) + PS_pre[4] * log(PS_post[4]/PS_pre[4])  ; 
+    Data$surprise[t] = Ps_post[1] * log(PS_post[1]/PS_pre[1]) + Ps_post[2] * log(PS_post[2]/PS_pre[2]) +
+      Ps_post[3] * log(PS_post[3]/PS_pre[3]) + Ps_post[4] * log(PS_post[4]/PS_pre[4])  ; 
     
     # assign other values to the dataset
     Data[t, PSpreindex]<-PS_pre
