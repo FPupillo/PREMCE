@@ -75,9 +75,8 @@ simulate_RescorlaWagner_IC_weight<-function ( Data,alpha, beta,  initialV){
     
     count[Murkcounter]<-count[Murkcounter]+1 # update the counter
 
-    
     p<-softmax(V, beta)
-    
+    #p<-V
     
     # make choice according to choice probabilities
     Data$response[t] <- chooseMultinom(p)
@@ -100,29 +99,30 @@ simulate_RescorlaWagner_IC_weight<-function ( Data,alpha, beta,  initialV){
     }
     
 
+    var<-var(unlist(V))
     
-    updateVal<-update_RW(r = r, V = V, alpha = alpha)
+    # uncertainty
+    Data$uncertainty[t]<-1/var
+    
+    lr<-sigmoid(Data$uncertainty[t])
+    #p<- Data$uncertainty[t]*r +(1-Data$uncertainty[t])  *V   
+    
+    updateVal<-update_RW(r = r, V = V, alpha = lr)
     
     # variance cp
     #var<- -sum(p[1]*log(p[1]+0.75)+p[2]*log(p[2]+0.75)+p[3]*log(p[3]+0.75)+p[4]*log(p[4]+0.75))
     
-    var<-var(unlist(p))/0.25
-    
-    # uncertainty
-    Data$uncertainty[t]<-1-var
-    
+  
     V<-updateVal$V
-    
-    p<- Data$uncertainty[t]*r +(1-Data$uncertainty[t])  *V  
-    
     
     # prediction error
     delta <- updateVal$delta
     
     # assign it to the dataset
     Data[t, Deltaindex]<-delta
+  
+ 
     
-
     
     # assign values to the dataset
     Data[t, Vindex]<-V

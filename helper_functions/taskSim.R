@@ -33,12 +33,16 @@ taskSim<-function(
   Pincong=(1-Pcong)/(categN-1) 
   
   characters<-c("stimuli/m2.png", "stimuli/m5.png")
-  
+
   # select the categories 
   selCat<-c( "Outdoor activity & sport item", "Kitchen & utensil",
              "Electronic device & accessory", "Hand labour tool & accessory")
   
   categ<-selCat
+  
+  if (categN<4){
+    categ<-selCat[1:categN]
+  }
   
   # create dataframe
   df<-as.data.frame(matrix(NA, ncol = 11, nrow = Ntrial*(switchN+1)))
@@ -49,7 +53,7 @@ taskSim<-function(
   
   # put the categories
   for (n in 1:nrow(df)){
-    df[n,1:4]<-categ
+    df[n,1:categN]<-categ
   }
   
   # create the switch condition
@@ -67,7 +71,12 @@ taskSim<-function(
   # create correct answer for them
   # the answer is drawn from the categories with the predefinite prob
   # correct category for one character
+  if (categN<4){
+    corr_cat1<-seq(1:categN-1)
+  } else {
   corr_cat1<-seq(1:(switchN+1))
+  }
+  
   # correct category for the other character
   corr_cat2<-rev(corr_cat1)
   
@@ -89,14 +98,14 @@ taskSim<-function(
   df$obj_category<-NA
   for (n in 1:nrow(df)){
     df$obj_category[n]<-sample(c(categ[df$opt_choice[n]], categ[-df$opt_choice[n]]), 1,
-                               prob = c(Pcong, rep(Pincong, 3) ))
+                               prob = c(Pcong, rep(Pincong, categN-1) ))
     if (df$obj_category[n]==df$opt_choice_cat[n]){
       df$trial_cond[n]<-1 }else{ df$trial_cond[n]<-0}
   }
   
   # get corr_ans
   for (n in 1:nrow(df)){
-    df$corr_ans[n]<-which(as.character(df[n,1:4])==df$obj_category[n])
+    df$corr_ans[n]<-which(as.character(df[n,1:categN])==df$obj_category[n])
   }
   
   # trial Number

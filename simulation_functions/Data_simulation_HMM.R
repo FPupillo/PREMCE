@@ -34,6 +34,7 @@ source("helper_functions/taskSim.R")
 source(("helper_functions/softmax.R"))
 source(("helper_functions/chooseMultinom.R"))
 source(("helper_functions/BICcompute.R"))
+source("simulation_functions/simulate_HMM.R")
 source("likelihood_functions/lik_HMM.R")
 source("fitting_functions/fit_HMM.R")
 source("helper_functions/getCat.R")
@@ -66,7 +67,7 @@ for (n in 1:nrow(Data)){
 }
 
 # simulate behaviour at different alpha values and beta
-sims<-5
+sims<-50
 
 # parameter length
 lengthparam<-sims
@@ -143,7 +144,7 @@ for (simul in 1:sims){
 # save the simulation
 
 # save the data
-#save(list = c("simPerf", "simData"), file = "output_files/simulationData_PH.Rdata")
+save(list = c("simPerf", "simData"), file = "output_files/simulationData_HMM.Rdata")
 #load("output_files/simulationData_PH.Rdata")
 
 # summarise it first
@@ -218,12 +219,12 @@ p1<-ggplot(data = simPerfAgg, aes(x = gamma, y = c, fill = perOptim))+
   scale_fill_gradient(low="black", high="white",name ="p(correct \nchoice)") + theme_bw()
 
 # plot line graph
-p2<-ggplot(data=simPerfAgg, aes(x=beta,y=perOptim, color = gamma, group=gamma)) + 
+p2<-ggplot(data=simPerfAgg, aes(x=c,y=perOptim, color = gamma, group=gamma)) + 
   theme_bw() + 
  geom_errorbar(aes(ymin = lowerSE, ymax = upperSE), width = 1) + 
   geom_line() + scale_color_continuous(name = "learning rate") 
 
-p3<-ggplot(data=simPerfAgg, aes(x=alpha,y=perOptim, color=gamma, group=c)) + 
+p3<-ggplot(data=simPerfAgg, aes(x=gamma,y=perOptim, color=gamma, group=c)) + 
   theme_bw() + 
   geom_errorbar(aes(ymin = lowerSE, ymax = upperSE)) + 
   geom_line() + scale_color_continuous(name = "beta") 
@@ -231,37 +232,37 @@ p3<-ggplot(data=simPerfAgg, aes(x=alpha,y=perOptim, color=gamma, group=c)) +
 # arrange the two
 grid.arrange(p1, p2, p3,ncol=2)
 
-ggsave("output_files/optimalperf.jpg")
+ggsave("output_files/optimalperf_HMM.jpg")
   
 
-# now for only one simulation
-sim<-simulate_PearceHall(Data=Data,
-                          alpha =0.6 , beta = 5, k=1, gamma=0.1,  initialV = 0.25)
-
-ggplot(sim, aes(x=trialN))+
-  
-  geom_line(aes(y=P1), size = 1.5, color = "blue")+
-  geom_line(aes(y=P2),size = 1.5, color = "darkgreen")+
-  geom_line(aes(y=P3),size = 1.5, color = "brown")+
-  geom_line(aes(y=P4), size = 1.5,color = "orange")+
-  #geom_line(aes(y=Delta), color = "red")+
-  theme_bw()+
-  
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
-  ylab("Choice Probabilities")
-
-
-
-
-ggsave("figures/estimatedCP_PH2_alpha=0.75_beta=5.jpg")
-
-ggplot(sim, aes(x=trialN))+
-  
-  geom_line(aes(y=alpha), color = "red")+
-  theme_bw()+
-  
-  geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
-  ylab("learning rate")
-
-ggsave("figures/learningrate_PH2_alpha=0.75_beta=5.jpg")
-
+# # now for only one simulation
+# sim<-simulate_PearceHall(Data=Data,
+#                         alpha =0.6 , beta = 5, k=1, gamma=0.1,  initialV = 0.25)
+# 
+# ggplot(sim, aes(x=trialN))+
+#   
+#   geom_line(aes(y=P1), size = 1.5, color = "blue")+
+#   geom_line(aes(y=P2),size = 1.5, color = "darkgreen")+
+#   geom_line(aes(y=P3),size = 1.5, color = "brown")+
+#   geom_line(aes(y=P4), size = 1.5,color = "orange")+
+#   #geom_line(aes(y=Delta), color = "red")+
+#   theme_bw()+
+#   
+#   geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+#   ylab("Choice Probabilities")
+# 
+# 
+# 
+# 
+# ggsave("figures/estimatedCP_HMM_alpha=0.75_beta=5.jpg")
+# 
+# ggplot(sim, aes(x=trialN))+
+#   
+#   geom_line(aes(y=alpha), color = "red")+
+#   theme_bw()+
+#   
+#   geom_vline(xintercept = c (Ntrial,  Ntrial*2, Ntrial*3))+
+#   ylab("learning rate")
+# 
+# ggsave("figures/learningrate_HMM.jpg")
+# 

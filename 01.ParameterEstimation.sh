@@ -1,0 +1,6 @@
+# script that runs the parameter estimation for all the models
+
+Rscript parameter_estimation/Parameter.estimation_RescorlaWagner_IC.R
+Rscript parameter_estimation/Parameter.estimation_RescorlaWagner_simple.R
+Rscript parameter_estimation/Parameter.estimation_RescorlaWagner_EC.R
+Rscript parameter_estimation/Parameter.estimation_HMM.R

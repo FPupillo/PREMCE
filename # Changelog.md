@@ -10,3 +10,6 @@
 regardless of the murks
 - created PH2 based on equation 8 of PEarce hall (1980) as suggested by rasmus. 
 - made parameter recovery and simulations for this model
+
+### 06/12/2021
+- created "HMM_rev" function to include Lei's suggestions and done parameter recovery
